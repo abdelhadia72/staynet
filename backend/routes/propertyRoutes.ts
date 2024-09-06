@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import {
   createProperty,
   getProperties,
@@ -6,20 +6,20 @@ import {
   updateProperty,
 } from "../controllers/propertyController";
 
-const router = express.Router();
+const propertyRouter = express.Router();
 
 // create new property
-router.post("/", createProperty);
+propertyRouter.post("/", createProperty);
 
 // get property by id
-router.get("/:id", getProperty);
+propertyRouter.get("/:id", getProperty);
 
 // get all properties
-router.get("/", getProperties);
+propertyRouter.get("/", getProperties);
 
 // update property
-router.put("/:id", (req: Request, res: Response) => {
+propertyRouter.put("/:id", (req: Request, res: Response) => {
   updateProperty(req, res);
 });
 
-export default router;
+export default propertyRouter;
