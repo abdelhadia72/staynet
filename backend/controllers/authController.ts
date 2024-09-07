@@ -7,9 +7,9 @@ import generateTokenAndSetCookie from "../utils/genrateTokenAndSetCookie";
 
 // Signup route
 const signup = async (req: Request, res: Response) => {
-  const { email, password, name } = req.body;
+  const { email, password, name, role } = req.body;
   try {
-    if (!email || !password || !name) {
+    if (!email || !password || !name || !role) {
       throw new Error("All fields are required");
     }
 
@@ -27,6 +27,7 @@ const signup = async (req: Request, res: Response) => {
       email,
       password: hashPassword,
       name,
+      role,
       verificationToken: verificationToken,
       verificationTokenExpires: verificationExpiresToken,
     });
@@ -49,7 +50,6 @@ const signup = async (req: Request, res: Response) => {
         error instanceof Error ? error.message : "An unknown error occurred",
     });
   }
-  res.status(200).json({ message: "Signup route" });
 };
 
 // login route
