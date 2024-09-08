@@ -1,5 +1,10 @@
 import express, { Request, Response } from "express";
-import { signup, login, logout } from "../controllers/authController";
+import {
+  signup,
+  login,
+  logout,
+  verifyEmail,
+} from "../controllers/authController";
 
 const authRoutes = express.Router();
 
@@ -7,13 +12,11 @@ const authRoutes = express.Router();
 authRoutes.post("/signup", signup);
 
 // login route
-authRoutes.get("/login", (req: Request, res: Response) => {
-  res.status(200).json({ message: "login route" });
-});
+authRoutes.post("/login", login);
 
 // Logout route
-authRoutes.get("/logout", (req: Request, res: Response) => {
-  res.status(200).json({ message: "Logout route" });
-});
+authRoutes.post("/logout", logout);
+
+authRoutes.post("/verify-email", verifyEmail);
 
 export default authRoutes;

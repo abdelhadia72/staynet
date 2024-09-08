@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import generateVerificationToken from "../utils/generateVerificationToken";
 import { verificationTokenExpires } from "../utils/verificationTokenExpires";
 import generateTokenAndSetCookie from "../utils/genrateTokenAndSetCookie";
-import sendVerificationEmail from "../mail/sendEmail";
+import { sendVerificationEmail, sendWelcomeEmail } from "../mail/sendEmail";
 
 // Signup route
 const signup = async (req: Request, res: Response) => {
@@ -67,4 +67,46 @@ const logout = (req: Request, res: Response) => {
   res.status(200).json({ message: "Logout route" });
 };
 
-export { signup, login, logout };
+const verifyEmail = async (req: Request, res: Response) => {
+  // remove me
+  console.log("Entire request body:", req.body);
+  const { code } = req.body;
+  if (!code) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Verification code is required" });
+  }
+  // remove me
+  console.log("The code is", code);
+  try {
+    const user = await User.findOne({
+      verificationToken: code,
+      verificationTokenExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+    await user.save();
+
+    await sendWelcomeEmail(user.email, user.name);
+    res.status(200).json({
+      success: true,
+      message: "Welcome email sent successfully",
+      user: {
+        ...user.toObject(),
+        password: undefined,
+      },
+    });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ success: false, message: "Invalid or expired token" });
+  }
+};
+
+export { signup, login, logout, verifyEmail };
