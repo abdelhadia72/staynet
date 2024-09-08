@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import generateVerificationToken from "../utils/generateVerificationToken";
 import { verificationTokenExpires } from "../utils/verificationTokenExpires";
 import generateTokenAndSetCookie from "../utils/genrateTokenAndSetCookie";
+import sendVerificationEmail from "../mail/sendEmail";
 
 // Signup route
 const signup = async (req: Request, res: Response) => {
@@ -36,6 +37,10 @@ const signup = async (req: Request, res: Response) => {
 
     // jwt token
     generateTokenAndSetCookie(res, newUser.id);
+
+    // send verfationemail
+    sendVerificationEmail(newUser.email, newUser.verificationToken);
+
     res.status(201).json({
       success: true,
       message: "User created successfully.",
