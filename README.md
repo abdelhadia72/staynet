@@ -37,7 +37,7 @@ Staynet is a modern, full-stack accommodation booking platform inspired by Airbn
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/staynet.git
+   git clone https://github.com/abdelhadia72/staynet.git
    cd staynet
    ```
 
