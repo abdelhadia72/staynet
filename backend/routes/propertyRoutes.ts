@@ -8,18 +8,20 @@ import {
 
 const propertyRouter = express.Router();
 
-// create new property
-propertyRouter.post("/", createProperty);
+// get all properties
+propertyRouter.get("/", getProperties);
 
 // get property by id
 propertyRouter.get("/:id", getProperty);
 
-// get all properties
-propertyRouter.get("/", getProperties);
+// create new property
+propertyRouter.post("/", createProperty);
 
 // update property
 propertyRouter.put("/:id", (req: Request, res: Response) => {
   updateProperty(req, res);
 });
 
+// delete property
+// ADD ME
 export default propertyRouter;

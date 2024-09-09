@@ -17,6 +17,7 @@ authRoutes.post("/login", login);
 // Logout route
 authRoutes.post("/logout", logout);
 
+// verify email
 authRoutes.post("/verify-email", verifyEmail);
 
 export default authRoutes;

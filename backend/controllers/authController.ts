@@ -56,15 +56,51 @@ const signup = async (req: Request, res: Response) => {
     });
   }
 };
-
 // login route
-const login = (req: Request, res: Response) => {
-  res.status(200).json({ message: "login route" });
+const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Credentials." });
+    }
+
+    // check if password valid
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Credentials." });
+    }
+
+    // generate token
+    generateTokenAndSetCookie(res, user.id);
+    user.lastLogin = new Date();
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Logged in successfully",
+      user: {
+        ...user.toObject(),
+        password: undefined,
+      },
+    });
+  } catch (error) {
+    console.error("Error from login", error);
+    res
+      .status(500)
+      .json({ success: false, message: "An error occurred during login" });
+  }
 };
 
 // Logout route
 const logout = (req: Request, res: Response) => {
-  res.status(200).json({ message: "Logout route" });
+  // clear cookie
+  res.clearCookie("token");
+  res.status(200).json({ message: "logout successfully" });
 };
 
 const verifyEmail = async (req: Request, res: Response) => {
