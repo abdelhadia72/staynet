@@ -1,10 +1,16 @@
 import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
+import { sendResetEmail } from "../mail/sendEmail";
 import generateVerificationToken from "../utils/generateVerificationToken";
 import { verificationTokenExpires } from "../utils/verificationTokenExpires";
 import generateTokenAndSetCookie from "../utils/genrateTokenAndSetCookie";
-import { sendVerificationEmail, sendWelcomeEmail } from "../mail/sendEmail";
+import {
+  sendVerificationEmail,
+  sendWelcomeEmail,
+  SendSuccessEmail,
+} from "../mail/sendEmail";
 
 // Signup route
 const signup = async (req: Request, res: Response) => {
@@ -145,4 +151,113 @@ const verifyEmail = async (req: Request, res: Response) => {
   }
 };
 
-export { signup, login, logout, verifyEmail };
+const forgetPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    console.log("User b", user);
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Generate token (reset)
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    const expires = new Date(Date.now() + 3600000); // 1 hour
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = expires;
+    console.log("User a", user);
+
+    await user.save();
+
+    // send email
+    // !TODO: URL should be dynamic
+    await sendResetEmail(
+      user.email,
+      `http://localhost:3007/forgot-password"/${resetToken}`,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset email sent successfully",
+      user: {
+        ...user.toObject(),
+        password: undefined,
+      },
+    });
+  } catch (error) {
+    console.log("Error forget Password", error);
+  }
+};
+const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired token" });
+    }
+
+    // update the password
+    const hashedPassword = await bcrypt.hash(password, 12);
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    // Assuming SendSuccessEmail is imported and defined elsewhere
+    await SendSuccessEmail(user.email);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset successful" });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ success: false, message: "Invalid or expired token" });
+    console.log("Error reset Password", error);
+  }
+};
+const checkAuth = async (req: Request, res: Response) => {
+  try {
+    console.log("the user id from check is ", (req as any).userId?.toString());
+    const user = await User.findById((req as any).userId?.toString()).select(
+      "-password",
+    );
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found" });
+    }
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    });
+    console.error("Error in checkAuth:", error);
+  }
+};
+
+export {
+  signup,
+  login,
+  logout,
+  verifyEmail,
+  forgetPassword,
+  resetPassword,
+  checkAuth,
+};

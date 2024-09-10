@@ -69,7 +69,7 @@ export const resetPasswordEmail = `
                   <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 30px;">
                       <tr>
                           <td align="center">
-                              <a href="#" style="display: inline-block; padding: 14px 30px; background-color: #e74c3c; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 4px;">Reset Password</a>
+                              <a href="RESETURL" style="display: inline-block; padding: 14px 30px; background-color: #e74c3c; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 4px;">Reset Password</a>
                           </td>
                       </tr>
                   </table>
