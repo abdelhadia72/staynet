@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import propertyRouter from "./routes/propertyRoutes";
 import authRoutes from "./routes/authRoutes";
+import amenityRoutes from "./routes/amenityRoutes";
 
 // load the envs
 dotenv.config();
@@ -24,6 +25,9 @@ app.use("/api/auth", authRoutes);
 
 // property router
 app.use("/api/properties", propertyRouter);
+
+// amenities router
+app.use("/api/amenity", amenityRoutes);
 
 app.listen(port, () => {
   console.log(`connected check http://localhost:${port}`);
