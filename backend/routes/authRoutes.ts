@@ -22,7 +22,7 @@ authRoutes.post("/signup", signup);
 // login route
 authRoutes.post("/login", login);
 
-// Logout route
+// logout route
 authRoutes.post("/logout", logout);
 
 // verify email

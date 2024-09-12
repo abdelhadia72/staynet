@@ -15,6 +15,7 @@ const getAmenities = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 // Get amenity
 const getAmenity = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -65,7 +66,7 @@ const updateAmenity = async (req: Request, res: Response): Promise<void> => {
     }
     res.status(200).json(UAmenity);
   } catch (error) {
-    console.log("Error while update the amenity");
+    console.log("Error while update the amenity", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

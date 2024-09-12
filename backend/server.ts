@@ -6,6 +6,7 @@ import cors from "cors";
 import propertyRouter from "./routes/propertyRoutes";
 import authRoutes from "./routes/authRoutes";
 import amenityRoutes from "./routes/amenityRoutes";
+import reviewRouter from "./routes/reviewRoutes";
 
 // load the envs
 dotenv.config();
@@ -28,6 +29,9 @@ app.use("/api/properties", propertyRouter);
 
 // amenities router
 app.use("/api/amenity", amenityRoutes);
+
+// review router
+app.use("/api/review", reviewRouter);
 
 app.listen(port, () => {
   console.log(`connected check http://localhost:${port}`);
