@@ -4,7 +4,12 @@ import {
   getProperties,
   getProperty,
   updateProperty,
+  deleteProperty,
 } from "../controllers/propertyController";
+
+import isPropertyOwner from "../middleware/propertyMiddleware";
+import verifyToken from "../middleware/authMiddleware";
+import { verifyTokenAuth } from "../middleware/verifyTokenAuth";
 
 const propertyRouter = express.Router();
 
@@ -15,12 +20,19 @@ propertyRouter.get("/", getProperties);
 propertyRouter.get("/:id", getProperty);
 
 // create new property
-propertyRouter.post("/", createProperty);
+propertyRouter.post("/", verifyTokenAuth, isPropertyOwner, createProperty);
 
 // update property
-propertyRouter.put("/:id", (req: Request, res: Response) => {
-  updateProperty(req, res);
-});
+propertyRouter.put(
+  "/:id",
+  (req: Request, res: Response) => {
+    updateProperty(req, res);
+  },
+  verifyTokenAuth,
+  isPropertyOwner,
+);
+
+propertyRouter.delete("/:id", verifyTokenAuth, isPropertyOwner, deleteProperty);
 
 // delete property
 // ADD ME

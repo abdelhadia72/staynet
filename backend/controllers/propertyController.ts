@@ -68,4 +68,27 @@ const updateProperty = async (req: Request, res: Response) => {
   }
 };
 
-export { createProperty, getProperties, getProperty, updateProperty };
+const deleteProperty = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  console.log("this is the id", id);
+  try {
+    const propertyDeleted = await Property.findByIdAndDelete(id);
+    if (!propertyDeleted) {
+      return res.status(404).json({ message: "No property found (01)" });
+    }
+    res.status(200).json({ message: "Property deleted successfully" });
+  } catch (error) {
+    res.status(500).json({
+      message:
+        error instanceof Error ? error.message : "Can't delete the property",
+    });
+  }
+};
+
+export {
+  createProperty,
+  getProperties,
+  getProperty,
+  updateProperty,
+  deleteProperty,
+};
