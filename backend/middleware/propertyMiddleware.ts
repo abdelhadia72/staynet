@@ -29,7 +29,7 @@ const isPropertyOwner = async (
     console.log("middleware is owner ", property);
     if (!property) return res.status(404).json({ error: "Property not found" });
 
-    if (property.owner.toString() !== userId.toString()) {
+    if (property.owner_id.toString() !== userId.toString()) {
       return res
         .status(403)
         .json({ error: "Access denied. Not the property owner" });

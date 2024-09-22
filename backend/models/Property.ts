@@ -5,7 +5,24 @@ export interface IProperty extends Document {
   description: string;
   price: number;
   location: string;
-  owner: string;
+  property_type: {
+    type: String;
+    enum: ["apartment", "villa", "house", "apartment", "condo", "land"];
+    required: true;
+  };
+  status: {
+    type: String;
+    enum: ["for_sale", "for_rent", "sold", "rented"];
+    required: true;
+  };
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  address: String;
+  city: String;
+  country: String;
+  zip_code: String;
+  owner_id: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -16,7 +33,24 @@ export const PropertySchema = new Schema(
     description: { type: String, required: true, trim: true, maxlength: 1000 },
     price: { type: Number, required: true, min: 0, max: 1000000 },
     location: { type: String, required: true, trim: true, maxlength: 200 },
-    owner: { type: String, required: true },
+    owner_id: { type: String, required: true },
+    property_type: {
+      type: String,
+      enum: ["apartment", "villa", "house", "apartment", "condo", "land"],
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["for_sale", "for_rent", "sold", "rented"],
+      required: true,
+    },
+    bedrooms: { type: Number, required: true, min: 1, max: 20 },
+    bathrooms: { type: Number, required: true, min: 1, max: 10 },
+    area: { type: Number, required: true, min: 1 },
+    address: { type: String, required: true, trim: true, maxlength: 200 },
+    city: { type: String, required: true, trim: true, maxlength: 100 },
+    country: { type: String, required: true, trim: true, maxlength: 100 },
+    zip_code: { type: String, required: true, trim: true, maxlength: 20 },
   },
   {
     timestamps: true,
