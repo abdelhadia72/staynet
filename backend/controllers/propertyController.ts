@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import Property from "../models/Property";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
-// Get all propertyes
+// Get all properties
 const getProperties = async (req: Request, res: Response) => {
   try {
     const properties = await Property.find();
@@ -9,17 +10,17 @@ const getProperties = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({
       message:
-        error instanceof Error ? error.message : "Can't find any property",
+        error instanceof Error ? error.message : "Can't find any properties",
     });
   }
 };
 
-//Get a propety
+// Get a property
 const getProperty = async (req: Request, res: Response) => {
   try {
     const property = await Property.findById(req.params.id);
     if (!property) {
-      return res.status(404).json({ message: "Property not found !" });
+      return res.status(404).json({ message: "Property not found!" });
     }
     return res.status(200).json(property);
   } catch (error) {
@@ -33,7 +34,21 @@ const getProperty = async (req: Request, res: Response) => {
 // Create new property
 const createProperty = async (req: Request, res: Response) => {
   try {
-    const newProperty = new Property(req.body);
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    const userId = decoded.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const newProperty = new Property({
+      ...req.body,
+      owner: userId,
+    });
+
     const savedProperty = await newProperty.save();
     res.status(201).json(savedProperty);
   } catch (error) {
@@ -52,29 +67,30 @@ const updateProperty = async (req: Request, res: Response) => {
       req.body,
       {
         new: true,
+        runValidators: true,
       },
     );
 
     if (!updatedProperty) {
-      return res.status(404).json({ message: "Can't find the Property" });
+      return res.status(404).json({ message: "Property not found" });
     }
 
     res.status(200).json(updatedProperty);
   } catch (error) {
     res.status(500).json({
       message:
-        error instanceof Error ? error.message : "Can't Update the property",
+        error instanceof Error ? error.message : "Can't update the property",
     });
   }
 };
 
 const deleteProperty = async (req: Request, res: Response) => {
   const { id } = req.params;
-  console.log("this is the id", id);
+
   try {
     const propertyDeleted = await Property.findByIdAndDelete(id);
     if (!propertyDeleted) {
-      return res.status(404).json({ message: "No property found (01)" });
+      return res.status(404).json({ message: "Property not found" });
     }
     res.status(200).json({ message: "Property deleted successfully" });
   } catch (error) {

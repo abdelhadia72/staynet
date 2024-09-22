@@ -20,7 +20,7 @@ propertyRouter.get("/", getProperties);
 propertyRouter.get("/:id", getProperty);
 
 // create new property
-propertyRouter.post("/", verifyTokenAuth, isPropertyOwner, createProperty);
+propertyRouter.post("/", verifyTokenAuth, createProperty);
 
 // update property
 propertyRouter.put(
