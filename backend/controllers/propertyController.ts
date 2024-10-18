@@ -100,6 +100,50 @@ const deleteProperty = async (req: Request, res: Response) => {
     });
   }
 };
+const searchProperties = async (req: Request, res: Response) => {
+  try {
+    const page = parseInt(req.query.page as string) - 1 || 0;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = (req.query.search as string) || "";
+    const sort = (req.query.sort as string) || "price";
+    const location = (req.query.location as string) || "";
+    const type = (req.query.type as string) || "";
+    const status = (req.query.status as string) || "";
+    const country = (req.query.country as string) || "";
+    const city = (req.query.city as string) || "";
+
+    const query: any = {};
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+    if (location) query.location = { $regex: location, $options: "i" };
+    if (type) query.property_type = type;
+    if (status) query.status = status;
+    if (country) query.country = { $regex: country, $options: "i" };
+    if (city) query.city = { $regex: city, $options: "i" };
+
+    const total = await Property.countDocuments(query);
+    const properties = await Property.find(query)
+      .sort({ [sort]: 1 })
+      .skip(page * limit)
+      .limit(limit);
+
+    res.status(200).json({
+      properties,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page + 1,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message:
+        error instanceof Error ? error.message : "Can't find any properties",
+    });
+  }
+};
 
 export {
   createProperty,
@@ -107,4 +151,5 @@ export {
   getProperty,
   updateProperty,
   deleteProperty,
+  searchProperties,
 };
