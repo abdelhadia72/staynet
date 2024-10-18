@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSignup } from "@/services/api";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,18 +15,28 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useRouter } from "next/navigation";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState("buyer");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const signupMutation = useSignup();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Here you would typically handle the signup logic
-    console.log("Signup attempt", { username, email, password });
+    try {
+      await signupMutation.mutateAsync({ username, email, password, role });
+      alert("Signup successful!");
+    } catch (error) {
+      console.error("Signup failed:", error);
+      // Error is handled by the mutation and displayed in the UI
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -60,6 +71,16 @@ export default function SignupPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            {signupMutation.isError && (
+              <Alert variant="destructive">
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                  {signupMutation.error instanceof Error
+                    ? signupMutation.error.message
+                    : "An error occurred during signup."}
+                </AlertDescription>
+              </Alert>
+            )}
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input
@@ -116,13 +137,27 @@ export default function SignupPage() {
                 </p>
               </div>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <select
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full p-2 border rounded-md"
+                required
+              >
+                <option value="buyer">Buyer</option>
+                <option value="seller">Seller</option>
+              </select>
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button
               type="submit"
               className="w-full bg-black hover:bg-gray-800 text-white"
+              disabled={signupMutation.isLoading}
             >
-              Sign Up
+              {signupMutation.isLoading ? "Signing up..." : "Sign Up"}
             </Button>
             <p className="text-sm text-center text-gray-600">
               Already have an account?{" "}

@@ -5,6 +5,7 @@ import {
   getProperty,
   updateProperty,
   deleteProperty,
+  searchProperties,
 } from "../controllers/propertyController";
 
 import isPropertyOwner from "../middleware/propertyMiddleware";
@@ -12,6 +13,9 @@ import verifyToken from "../middleware/authMiddleware";
 import { verifyTokenAuth } from "../middleware/verifyTokenAuth";
 
 const propertyRouter = express.Router();
+
+// search properties
+propertyRouter.get("/search", searchProperties);
 
 // get all properties
 propertyRouter.get("/", getProperties);

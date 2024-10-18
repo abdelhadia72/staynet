@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Alata } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import QueryProviders from "./react-query-provider";
 
 const alata = Alata({
   weight: "400",
@@ -22,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${alata.className} antialiased`}>
         <Navbar />
-        {children}
+        <QueryProviders>{children}</QueryProviders>
       </body>
     </html>
   );

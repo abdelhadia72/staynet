@@ -34,7 +34,7 @@ const signup = async (req: Request, res: Response) => {
       email,
       password: hashPassword,
       name,
-      role,
+      role: "user",
       verificationToken: verificationToken,
       verificationTokenExpires: verificationExpiresToken,
     });
